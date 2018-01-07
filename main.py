@@ -83,13 +83,13 @@ def meanSquaredError(y_true, y_predict):
 
 #------------------------------Drawing Graph -----------------------------------#
 
-def curveDraw(sizes, train_err, test_err,depth):
+def errorCurveDraw(sizes, train_err, test_err,depth,text):
 
 	# Drawing the training error vs the testing error to find the optimum depth
 
 	pl.figure()
 
-	pl.title ('Performance vs Training Size Using Depth = ' + str(depth))
+	pl.title ('Training ' + text  + ' Analysis Using Depth = ' + str(depth))
 
 	pl.plot(sizes, test_err, lw=2, color = 'Black',label = 'Test Error')
 
@@ -99,7 +99,7 @@ def curveDraw(sizes, train_err, test_err,depth):
 
 	pl.xlabel('Training Size')
 
-	pl.ylabel('Error')
+	pl.ylabel(text)
 
 	pl.show()
 
@@ -110,9 +110,14 @@ def decisionTreeReg(depth, X_train, y_train, X_test, y_test):
 
 	sizes = np.linspace(1, len(X_train), 50)
 	#creating up to 50 different training sizes
-	train_err = np.zeros(len(sizes))
 
-	test_err = np.zeros(len(sizes))
+	train_err = np.zeros(len(sizes))
+	test_err = np.zeros(len(sizes))	
+	# These two are used for training error analysis using mean square error
+
+	train_score = np.zeros(len(sizes))
+	test_score = np.zeros(len(sizes))
+	# These two are used for training score analysis using R^2
 
 	for i, s in enumerate(sizes):
 
@@ -123,13 +128,18 @@ def decisionTreeReg(depth, X_train, y_train, X_test, y_test):
         # Training the model
 
 		train_err[i] = meanSquaredError(y_train[:int(s)], regressor.predict(X_train[:int(s)]))
+		train_score[i] = r2calc(y_train[:int(s)], regressor.predict(X_train[:int(s)]))
         # Finding the performance on the training set
 
 		test_err[i] = meanSquaredError(y_test, regressor.predict(X_test))
+		test_score[i] = r2calc(y_test, regressor.predict(X_test))
         # Finding the performance on the testing set
 
-	curveDraw(sizes, train_err, test_err,depth)
-    # drawing the graph
+	errorCurveDraw(sizes, train_err, test_err,depth,'Error')
+    # drawing the training error graph
+
+	errorCurveDraw(sizes, train_score, test_score,depth,'Score')
+    # drawing the training error graph
 
 #--------------------------- Fitting Model-------------------------------#
 
@@ -144,17 +154,17 @@ def fit_model(X, y):
     params = {"max_depth":range(1,10)}
     #Creating a dictionary of 1 to 10
 
-    # TODO: Transform 'performance_metric' into a scoring function using 'make_scorer' 
     scoring_fnc = metrics.make_scorer(r2calc)
+    # Transform r2calc into a scoring function using 'make_scorer' 
 
-    # TODO: Create the grid search object
     grid = GridSearchCV(regressor, params, scoring_fnc, cv=cv_sets)
+    # Create the grid search object
 
-    # Fit the grid search object to the data to compute the optimal model
     grid = grid.fit(X, y)
+    # Fit the grid search object to the data to compute the optimal model
 
-    # Return the optimal model after fitting the data
     return grid.best_estimator_
+    # FIrst fits the data and then Returning the optimal model 
 
 #------------------------------ Main Function ----------------------------------#
 
