@@ -1,4 +1,4 @@
-
+	
 
 #-----------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------#
@@ -91,9 +91,9 @@ def errorCurveDraw(sizes, train_err, test_err,depth,text):
 
 	pl.title ('Training ' + text  + ' Analysis Using Depth = ' + str(depth))
 
-	pl.plot(sizes, test_err, lw=2, color = 'Black',label = 'Test Error')
+	pl.plot(sizes, test_err, lw=2, color = 'Black',label = 'Test' + text)
 
-	pl.plot(sizes, train_err, lw=2, color = 'Blue', label = 'Training Error')
+	pl.plot(sizes, train_err, lw=2, color = 'Blue', label = 'Training' + text)
 
 	pl.legend()
 
@@ -187,7 +187,7 @@ def main():
 		decisionTreeReg(max_depth, X_train, y_train, X_test, y_test)
     # Decision Tree regression curves are created in this part
 
-	reg = fit_model(X_train, y_train)
+	reg = fit_model(attributes, prices)
 	# Fit the training data to the model using grid search
 
 	print "Parameter 'max_depth' is {} for the optimal model.".format(reg.get_params()['max_depth'])
